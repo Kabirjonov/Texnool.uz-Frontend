@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { checkGostToken } from "@/lib/ghostSession";
+import { useSessionStore } from "@/store/useSession.store";
 
 export const NavLinks = [
 	{
@@ -46,7 +48,7 @@ export const NavLinks = [
 export default function NavMenu(props: ComponentProps<typeof NavigationMenu>) {
 	const pathname = usePathname();
 	const { t } = useTranslation();
-
+	const { isAuth } = useSessionStore();
 	return (
 		<NavigationMenu {...props}>
 			<NavigationMenuList className='space-x-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-start data-[orientation=vertical]:justify-start'>
@@ -69,6 +71,24 @@ export default function NavMenu(props: ComponentProps<typeof NavigationMenu>) {
 						</NavigationMenuLink>
 					</NavigationMenuItem>
 				))}
+				{checkGostToken() && isAuth && (
+					<NavigationMenuItem>
+						<NavigationMenuLink
+							asChild
+							className={navigationMenuTriggerStyle()}
+						>
+							<Link
+								href='/myorders'
+								className={cn(
+									"flex items-center gap-1",
+									pathname === "/myorders" && "text-primary",
+								)}
+							>
+								MyOrders
+							</Link>
+						</NavigationMenuLink>
+					</NavigationMenuItem>
+				)}
 			</NavigationMenuList>
 		</NavigationMenu>
 	);

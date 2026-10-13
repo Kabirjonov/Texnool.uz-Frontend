@@ -17,6 +17,7 @@ import {
 	IOrder,
 	PaymentStatus,
 } from "@/type";
+import { saveGhostToken } from "@/lib/ghostSession";
 
 interface GetOrdersResponse {
 	orders: IOrder[];
@@ -100,7 +101,9 @@ export const useMyOrders = (userId: number | null, enabled = true) => {
 		GetMyOrdersResponse,
 		{ userId: number }
 	>(GET_MY_ORDERS, {
-		variables: { userId: userId ?? 0 },
+		variables: {
+			userId: userId as number,
+		},
 		skip: !enabled || !userId,
 		fetchPolicy: "cache-and-network",
 	});
@@ -128,6 +131,9 @@ export const useCreateOrder = () => {
 	>(CREATE_ORDER, {
 		refetchQueries: [{ query: GET_ORDERS }],
 		awaitRefetchQueries: true,
+		onCompleted: data => {
+			saveGhostToken(data);
+		},
 		onError: currentError => {
 			toast.error(getGraphqlErrorMessage(currentError));
 		},
